@@ -1,0 +1,68 @@
+modules:
+  jira:customFieldType:
+    - key: calculated-score-field
+      name: Calculated Score Field
+      description: Computes a numerical score from other Jira field values using a user-defined formula.
+      type: number
+      readOnly: false
+      resolver:
+        function: main
+      function: recalculate-score
+      view:
+        render: native
+        resource: calculated-field-view
+        experience:
+          - issue-view
+      edit:
+        render: native
+        resource: calculated-field-edit
+      contextConfig:
+        render: native
+        resource: calculated-field-config
+
+  trigger:
+    - key: field-change-trigger
+      function: recalculate-score
+      events:
+        - avi:jira:updated:issue
+
+  function:
+    - key: recalculate-score
+      handler: index.recalculateScore
+    - key: main
+      handler: index.handler
+
+resources:
+  - key: calculated-field-view
+    path: src/frontend/calculatedFieldView.tsx
+  - key: calculated-field-edit
+    path: src/frontend/calculatedFieldEdit.tsx
+  - key: calculated-field-config
+    path: src/frontend/calculatedFieldConfig.tsx
+
+app:
+  runtime:
+    name: nodejs22.x
+  id: ari:cloud:ecosystem::app/a184d8da-00c4-476b-96da-66bf55c11385
+  storage:
+    entities:
+      - name: formula-config
+        attributes:
+          fieldId:
+            type: string
+          fieldContextId:
+            type: integer
+          formula:
+            type: string
+          trackedFields:
+            type: any
+          createdAt:
+            type: string
+          updatedAt:
+            type: string
+
+permissions:
+  scopes:
+    - read:jira-work
+    - write:jira-work
+    - storage:app
