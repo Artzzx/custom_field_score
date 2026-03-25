@@ -53,15 +53,11 @@ export async function listAllFormulaConfigs(): Promise<FormulaConfig[]> {
     let cursor: string | undefined;
 
     do {
-      // Build the query — cursor() must be called before getMany()
-      // The legacy storage.entity().query() builder supports: .limit(n), .cursor(token), .getMany()
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const builder = (storage.entity(ENTITY_NAME).query() as any).limit(100);
+      // Use the named index to scan all configs — supports cursor-based pagination
+      const queryBuilder = storage.entity(ENTITY_NAME).query().index('by-fieldId');
       const result = cursor
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        ? await (builder as any).cursor(cursor).getMany()
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        : await (builder as any).getMany();
+        ? await queryBuilder.cursor(cursor).getMany()
+        : await queryBuilder.getMany();
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const page = ((result as any).results ?? []) as Array<{ key: string; value: unknown }>;

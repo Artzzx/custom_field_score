@@ -23,30 +23,30 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">70.9% </span>
+                <span class="strong">87.27% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>39/55</span>
+                <span class='fraction'>48/55</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">30% </span>
+                <span class="strong">45% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>6/20</span>
+                <span class='fraction'>9/20</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">83.33% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>5/6</span>
+                <span class='fraction'>6/6</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">72.22% </span>
+                <span class="strong">87.03% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>39/54</span>
+                <span class='fraction'>47/54</span>
             </div>
         
             
@@ -182,11 +182,7 @@
 <a name='L117'></a><a href='#L117'>117</a>
 <a name='L118'></a><a href='#L118'>118</a>
 <a name='L119'></a><a href='#L119'>119</a>
-<a name='L120'></a><a href='#L120'>120</a>
-<a name='L121'></a><a href='#L121'>121</a>
-<a name='L122'></a><a href='#L122'>122</a>
-<a name='L123'></a><a href='#L123'>123</a>
-<a name='L124'></a><a href='#L124'>124</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">3x</span>
+<a name='L120'></a><a href='#L120'>120</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">3x</span>
@@ -242,31 +238,27 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">3x</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">3x</span>
-<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -364,29 +356,25 @@ export async function listAllFormulaConfigs(): Promise&lt;FormulaConfig[]&gt; {
     let cursor: string | undefined;
 &nbsp;
     do {
-      // Build the query — cursor() must be called before getMany()
-      // The legacy storage.entity().query() builder supports: .limit(n), .cursor(token), .getMany()
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const builder = (storage.entity(ENTITY_NAME).query() as any).limit(100);
-      const result = <span class="cstat-no" title="statement not covered" >cursor</span>
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        ? await (builder as any).cursor(cursor).getMany()
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        : await (builder as any).getMany();
+      // Use the named index to scan all configs — supports cursor-based pagination
+      const queryBuilder = storage.entity(ENTITY_NAME).query().index('by-fieldId');
+      const result = cursor
+        ? <span class="branch-0 cbranch-no" title="branch not covered" >await queryBuilder.cursor(cursor).getMany()</span>
+        : await queryBuilder.getMany();
 &nbsp;
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const page = ((<span class="cstat-no" title="statement not covered" >result as any).results ?? [])</span> as Array&lt;{ key: string; value: unknown }&gt;;
-<span class="cstat-no" title="statement not covered" >      for (const item of page) {</span>
-<span class="cstat-no" title="statement not covered" >        if (item.value) {</span>
-<span class="cstat-no" title="statement not covered" >          configs.push(item.value as FormulaConfig);</span>
+      const page = ((result as any).results ?? <span class="branch-1 cbranch-no" title="branch not covered" >[])</span> as Array&lt;{ key: string; value: unknown }&gt;;
+      for (const item of page) {
+        <span class="missing-if-branch" title="else path not taken" >E</span>if (item.value) {
+          configs.push(item.value as FormulaConfig);
         }
       }
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-<span class="cstat-no" title="statement not covered" >      cursor = (result as any).nextCursor as string | undefined;</span>
+      cursor = (result as any).nextCursor as string | undefined;
     } while (cursor);
 &nbsp;
-<span class="cstat-no" title="statement not covered" >    console.log(`[FormulaConfigStore] Found ${configs.length} formula config(s)`);</span>
-<span class="cstat-no" title="statement not covered" >    return configs;</span>
+    console.log(`[FormulaConfigStore] Found ${configs.length} formula config(s)`);
+    return configs;
   } catch (err) {
     console.error('[FormulaConfigStore] Error listing configs:', err instanceof Error ? err.message : <span class="branch-1 cbranch-no" title="branch not covered" >String(err),</span> err);
     return [];
@@ -402,7 +390,7 @@ export async function getFormulaConfigsByFieldId(fieldId: string): Promise&lt;Fo
   try {
     console.log(`[FormulaConfigStore] Querying configs by fieldId: ${fieldId}`);
     const all = await listAllFormulaConfigs();
-    const configs = all.filter(<span class="fstat-no" title="function not covered" >(c</span>) =&gt; <span class="cstat-no" title="statement not covered" >c.fieldId === fieldId)</span>;
+    const configs = all.filter((c) =&gt; c.fieldId === fieldId);
     console.log(`[FormulaConfigStore] Found ${configs.length} config(s) for fieldId: ${fieldId}`);
     return configs;
   } catch (err) {
@@ -439,7 +427,7 @@ export async function saveFormulaConfigToStore(config: FormulaConfig): Promise&l
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-03-25T18:33:08.126Z
+                at 2026-03-25T19:04:39.668Z
             </div>
         <script src="../../../prettify.js"></script>
         <script>
